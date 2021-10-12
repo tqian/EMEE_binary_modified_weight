@@ -12,6 +12,7 @@
 
 # Yihan Bao
 # update on 2021.07.31: to include modified-EMEE
+
 ##### simulation part #####
 
 rm(list = ls())
@@ -145,7 +146,7 @@ for (i_ss in 1:length(sample_sizes)) {
     }
     sink()
     
-    ee_names <- c("wcls_new", "wcls", "gee_ind", "gee_exch")
+    ee_names <- c("modified_EMEE", "EMEE", "gee_ind", "gee_exch")
     alpha_names <- c("Intercept", control_vars)
     beta_names <- c("Intercept", moderator_vars)
     num_estimator <- length(ee_names)

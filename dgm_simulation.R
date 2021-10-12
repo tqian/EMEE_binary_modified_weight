@@ -1,11 +1,10 @@
 # Yihan Bao, 2021.05.19
 # In this code, I constructed simulation dataset.
 
-dgm_binary_categorical_covariate_new <- function(sample_size, total_T, Delta) {
+dgm_binary_categorical_covariate_new <- function(sample_size, total_T, Delta, prob_a = 0.2) {
 
   beta_0 <- 0.1
   beta_1 <- 0.2
-  prob_a <- 0.2
   
   df_names <- c("userid", "day", "A", "S", "S2","prob_A","prob_R_0", "prob_R","R","Y","k") 
   # prob_R_0 is the probability of R = 0 given A = 0.
