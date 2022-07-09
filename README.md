@@ -16,19 +16,22 @@ This repository contains the code to replicate all numerical results in our pape
     * log_linear_GEE_geepack: fitting GEE using [geepack](https://www.jstatsoft.org/article/view/v015i02) package.
     * brm_DR, brm_MLE: brm estimator developed by [Richardson et al](https://arxiv.org/abs/1510.02430). This function is NOT used in the simulations presented in the paper.
 
-* [simulations_R](simulations_R): Code for reproducing the simulation results on consistency and efficiency tables of the paper. 
+* [simulation_figures.R](simulation_figures.R): Code for reproducing the simulation results on consistency and efficiency tables of the paper. 
 
 * [plot_delta.R](plot_delta.R): Code for reproducing efficiency plot vs different Deltas in paper.
 
 * [plot_proba.R](plot_proba.R): Code for reproducing efficiency plot vs different randomization probability of treatment in paper.
 
+* [analysis.R](analyis.R): Code for Drinkless data analysis of treatment in paper.
+
 ## Replicating Results
 
 ### Simulations
-* Run [simulations.R](simulations.R) to reproduce the simulation results on consistency and efficiency tables of the paper. 
+* Run [simulation_figures.R](simulation_figures.R) to reproduce the simulation results on consistency and efficiency tables of the paper. 
 
 * Run [plot_delta.R](plot_delta.R) to reproduce the efficiency plot vs different Deltas of the paper. 
 
 * Run [plot_proba.R](plot_proba.R) to reproduce the efficiency plot vs different randomization probability of treatment of the paper. 
 
 ### Applications
+* Run [analysis.R](analyis.R) to reproduce the data analysis section of paper.
