@@ -79,6 +79,7 @@ moderator_vars <- c()
 set.seed(1)
 
 efficiency_table = data.frame()
+result_table = data.frame()
 
 for (prob_a in (1:8)/10) {
     beta_true_marginal <- beta_true_marginal_generalDelta(Delta)
@@ -161,9 +162,14 @@ for (prob_a in (1:8)/10) {
         relative_efficiency = (result_df_collected$sd[c(2,4,6)]/result_df_collected$sd[c(1,3,5)])^2
     }
     efficiency_table = rbind(efficiency_table, c(prob_a,relative_efficiency))
+    result_df_collected$prob_a = prob_a
+    result_table = rbind(result_table, result_df_collected)
 }
 
 #saveRDS(efficiency_table, file = "efficiency_table_proba.RDS")
+saveRDS(efficiency_table, file = "efficiency_table_proba(with sd).RDS")
+saveRDS(result_table, file = "result_table_proba(with sd).RDS")
+
 
 ##### create plots for paper #####
 

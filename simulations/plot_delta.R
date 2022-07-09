@@ -78,6 +78,7 @@ moderator_vars <- c()
 set.seed(1)
 
 efficiency_table = data.frame()
+result_table = data.frame()
 
 for (Delta in 1:10) {
     beta_true_marginal <- beta_true_marginal_generalDelta(Delta)
@@ -89,6 +90,7 @@ for (Delta in 1:10) {
             if (isim %% 10 == 0) {
                 cat(paste("Starting iteration",isim,"\n"))
             }
+            # set probability of accepting treatment 0.2 
             dta <- data_generating_process(sample_size, total_T, Delta = Delta, prob_a = 0.2)
             
             # new EMEE estimator
@@ -160,9 +162,13 @@ for (Delta in 1:10) {
         relative_efficiency = (result_df_collected$sd[c(2,4,6)]/result_df_collected$sd[c(1,3,5)])^2
     }
     efficiency_table = rbind(efficiency_table, c(Delta,relative_efficiency))
+    result_df_collected$delta = Delta
+    result_table = rbind(result_table, result_df_collected)
 }
 
 #saveRDS(efficiency_table, file = "efficiency_table_delta.RDS")
+saveRDS(efficiency_table, file = "efficiency_table_delta(with sd).RDS")
+saveRDS(result_table, file = "result_table_delta(with sd).RDS")
 
 ##### create tables for paper #####
 

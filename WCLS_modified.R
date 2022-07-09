@@ -71,6 +71,7 @@ weighted_centered_least_square_withDelta_new <- function(
   
   sample_size <- length(unique(dta[, id_varname]))
   total_person_decisionpoint <- nrow(dta)
+  id_names <- unique(dta[,id_varname])
   
   if (is.null(avail_varname)) {
     avail <- rep(1, total_person_decisionpoint)
@@ -114,7 +115,7 @@ weighted_centered_least_square_withDelta_new <- function(
     WCLS_weight_inverseProb = rep(1, total_person_decisionpoint)
   }else{
     for (i in 1:sample_size){
-      dta_perid <- dta[dta[,id_varname] ==i,]
+      dta_perid <- dta[dta[,id_varname] == id_names[i],]
       dta_timepoint <- length(dta_perid[,decision_time_varname])
       
       #append with A_{T+1} ... A_{T+\delta-1} = 0
