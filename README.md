@@ -6,11 +6,11 @@ This repository contains the code to replicate all numerical results in our pape
 
 ## Scripts
 ### folder: estimator implementation
-* [WCLS_modified.R](estimator implementation/WCLS_modified.R): the modified-EMEE estimator proposed in paper. (Section 4 of paper)
+* [WCLS_modified.R](estimator_implementation/WCLS_modified.R): the modified-EMEE estimator proposed in paper. (Section 4 of paper)
 
-* [WCLS_original.R](estimator implementation/WCLS_original.R): Original EMEE estimator by [Qian, et al](https://arxiv.org/abs/1906.00528). 
+* [WCLS_original.R](estimator_implementation/WCLS_original.R): Original EMEE estimator by [Qian, et al](https://arxiv.org/abs/1906.00528). 
 
-* [GEE_estimators.R](estimator implementation/GEE_estimators.R): Implementation of GEE estimators, used for comparison with modified-EMEE.
+* [GEE_estimators.R](estimator_implementation/GEE_estimators.R): Implementation of GEE estimators, used for comparison with modified-EMEE.
     * log_linear_GEE: fitting GEE for MRT.
     * log_linear_GEE_geepack: fitting GEE using [geepack](https://www.jstatsoft.org/article/view/v015i02) package.
     * brm_DR, brm_MLE: brm estimator developed by [Richardson et al](https://arxiv.org/abs/1510.02430). This function is NOT used in the simulations presented in the paper.
@@ -19,7 +19,7 @@ This repository contains the code to replicate all numerical results in our pape
 * [simulation_results(marginal).R](simulations/simulation_results(marginal).R): Code for comparing the  
 performance of pd-EMEE, EMEE and GEE for fully marginal effect, setting delta = 3 and = 10 respectively.
 
-* [simulation_results(with moderator).R](simulations/simulation_results(with moderator).R): Code for comparing the  
+* [simulation_results(with_moderator).R](simulations/simulation_results(with_moderator).R): Code for comparing the  
 performance of pd-EMEE, EMEE and GEE for causal effect with moderator, setting delta = 3 and = 10 respectively.
 
 * [simulation_figures.R](simulations/simulation_figures.R): Code for reproducing the efficiency plot vs different Deltas and vs different randomization probability of treatment in the paper. 
@@ -31,7 +31,7 @@ performance of pd-EMEE, EMEE and GEE for causal effect with moderator, setting d
 * [dgm_simulation.R](simulations/dgm_simulation.R): a data-generative model for MRT data, used for simulation presented in the paper. (Described in the beginning of Section 4 of paper)
 
 ### folder: data analysis
-* [analysis.R](data analysis/analysis.R): Code for Drinkless data analysis of treatment in paper.
+* [analysis.R](data_analysis/analysis.R): Code for Drinkless data analysis of treatment in paper.
 
 ## Replicating Results
 
@@ -41,7 +41,7 @@ performance of pd-EMEE, EMEE and GEE for causal effect with moderator, setting d
 * Run [simulation_results(marginal).R](simulations/simulation_results(marginal).R) to reproduce the table of
 estimating performance across pd-EMEE, EMEE and GEE for fully marginal effect, setting delta = 3 and 10 for generating Table 1&3 respectively.
 
-* Run [simulation_results(with moderator).R](simulations/simulation_results(with moderator).R) to reproduce the table of estimating performance across pd-EMEE, EMEE and GEE for causal effect with moderator, setting delta = 3 and 10 for generating Table 2&4 respectively.
+* Run [simulation_results(with_moderator).R](simulations/simulation_results(with_moderator).R) to reproduce the table of estimating performance across pd-EMEE, EMEE and GEE for causal effect with moderator, setting delta = 3 and 10 for generating Table 2&4 respectively.
 
 ### Applications
-* Run [analysis.R](data analysis/analysis.R) to reproduce the data analysis section of paper.
+* Run [analysis.R](data_analysis/analysis.R) to reproduce the data analysis section of paper.
