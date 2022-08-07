@@ -74,8 +74,8 @@ beta_true_marginal_generalDelta <- function(Delta){
 
 # compute marginal beta_true
 if (0){
-  total_T = 30
-  Delta = 3
+  total_T = 100#30
+  Delta = 3 #10
   beta_0 <- 0.1
   beta_1 <- 0.2
   prob_a <- 0.2
@@ -91,7 +91,7 @@ if (0){
   denominator <-  sum( ((1- prob_R_0*E_S^(Delta-1))) * prob_S_weight)
   
   beta_true_marginal <- log(numerator / denominator)
-  print(beta_true_marginal) #0.2827493 when Delta = 3
+  print(beta_true_marginal) #0.2827493 
 }
 
 

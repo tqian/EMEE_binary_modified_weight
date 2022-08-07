@@ -172,7 +172,7 @@ saveRDS(result_table, file = "result_table_delta(with sd).RDS")
 
 ##### create tables for paper #####
 
-#efficiency_table <- readRDS("efficiency_table_delta.RDS")
+efficiency_table <- readRDS("efficiency_table_delta(with sd).RDS")
 
 efficiency_means <- rowMeans(efficiency_table[,2:4])
 efficiency_table$efficiency_means <- efficiency_means

@@ -28,7 +28,7 @@ colnames(efficiency_df_delta) <- c("Delta", "SS = 30", "SS = 50", "SS = 100",
 
 ggplot(efficiency_df_delta) +
   geom_line(aes(x = Delta, y = efficiency_means, linetype = "Relative Efficiency")) +
-  geom_line(aes(x = Delta, y = 200 * mod_var, linetype = "Variance of Modified-EMEE")) +
+  geom_line(aes(x = Delta, y = 200 * mod_var, linetype = "Variance of pd-EMEE")) +
   geom_line(aes(x = Delta, y = 200 * ori_var, linetype = "Variance of EMEE")) +
   geom_point(aes(x = Delta, y = efficiency_means)) +
   theme_bw() +
@@ -65,7 +65,7 @@ colnames(efficiency_df_proba) <- c("Prob_a(1)", "SS = 30", "SS = 50", "SS = 100"
 
 ggplot(efficiency_df_proba) +
   geom_line(aes(x = `Prob_a(1)`, y = efficiency_means, linetype = "Relative Efficiency")) +
-  geom_line(aes(x = `Prob_a(1)`, y = 50 * mod_var, linetype = "Variance of Modified-EMEE")) +
+  geom_line(aes(x = `Prob_a(1)`, y = 50 * mod_var, linetype = "Variance of pd-EMEE")) +
   geom_line(aes(x = `Prob_a(1)`, y = 50 * ori_var, linetype = "Variance of EMEE")) +
   geom_point(aes(x = `Prob_a(1)`, y = efficiency_means)) +
   theme_bw() +
