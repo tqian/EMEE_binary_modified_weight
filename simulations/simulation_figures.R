@@ -25,19 +25,41 @@ efficiency_df_delta$ori_var <- ori_var
 colnames(efficiency_df_delta) <- c("Delta", "SS = 30", "SS = 50", "SS = 100", 
                                    "efficiency_means","mod_var", "ori_var")
 
-
-ggplot(efficiency_df_delta) +
+#geom_point(aes(x = Delta, y = efficiency_means)) +
+p <- ggplot(efficiency_df_delta) +
   geom_line(aes(x = Delta, y = efficiency_means, linetype = "Relative Efficiency")) +
+  geom_point(aes(x = Delta, y = efficiency_means)) +
   geom_line(aes(x = Delta, y = 200 * mod_var, linetype = "Variance of pd-EMEE")) +
   geom_line(aes(x = Delta, y = 200 * ori_var, linetype = "Variance of EMEE")) +
-  geom_point(aes(x = Delta, y = efficiency_means)) +
   theme_bw() +
   labs(linetype="",x="Delta",y="Relative Efficiency") + 
   scale_y_continuous(sec.axis = sec_axis(~./200, name = "Variance of Estimators"))+ 
   theme(legend.position="bottom",legend.text = element_text(size = 6),
         axis.text = element_text(size = 8),
-        axis.title = element_text(size = 8)) + 
-  scale_linetype_manual(values=c("solid", "dotted", "dashed"))
+        axis.title = element_text(size = 8)) 
+  #scale_linetype_manual(values=c("solid", "dotted", "dashed"))
+  #guides(color = guide_legend(override.aes = list(linetype = c(1, 0, 0),shape = c(16, NA,NA)) ) )
+
+df_delta <- as.data.frame(rbind(cbind("Relative Efficiency", efficiency_df_delta$Delta, efficiency_df_delta$efficiency_means),
+                  cbind("Variance of pd-EMEE", efficiency_df_delta$Delta, efficiency_df_delta$mod_var*200),
+                  cbind("Variance of EMEE", efficiency_df_delta$Delta, efficiency_df_delta$ori_var*200)))
+colnames(df_delta) <- c("grps", "Delta","Relative Efficiency")
+df_delta$Delta <- as.numeric(df_delta$Delta)
+df_delta$`Relative Efficiency` <- as.numeric(df_delta$`Relative Efficiency`)
+
+p1 <- ggplot(data=df_delta, aes(x=Delta, y=`Relative Efficiency`, group=grps)) +
+  geom_line(aes(linetype=grps))+
+  geom_point(aes(size=grps))+
+  scale_size_manual(values=c(1, 0, 0))+
+  #labs(linetype="",x="Delta",y="Relative Efficiency") + 
+  scale_y_continuous(sec.axis = sec_axis(~./200, name = "Variance of Estimators"))+
+  theme(plot.title = element_text(size = 8, hjust = 0.5),
+        legend.title = element_blank(),
+        legend.position="bottom",
+        legend.text = element_text(size = 6), 
+        axis.text = element_text(size = 8),
+        axis.title = element_text(size = 8))+ 
+  ggtitle("Relative Efficiency of pd-EMEE to EMEE over Different Values of Randomization Probability of Delta")
 
 
 ######
@@ -63,7 +85,7 @@ colnames(efficiency_df_proba) <- c("Prob_a(1)", "SS = 30", "SS = 50", "SS = 100"
                                    "efficiency_means","mod_var", "ori_var")
 
 
-ggplot(efficiency_df_proba) +
+q <- ggplot(efficiency_df_proba) +
   geom_line(aes(x = `Prob_a(1)`, y = efficiency_means, linetype = "Relative Efficiency")) +
   geom_line(aes(x = `Prob_a(1)`, y = 50 * mod_var, linetype = "Variance of pd-EMEE")) +
   geom_line(aes(x = `Prob_a(1)`, y = 50 * ori_var, linetype = "Variance of EMEE")) +
@@ -75,3 +97,29 @@ ggplot(efficiency_df_proba) +
         axis.text = element_text(size = 8),
         axis.title = element_text(size = 8)) + 
   scale_linetype_manual(values=c("solid", "dotted", "dashed"))
+
+df_proba <- as.data.frame(rbind(cbind("Relative Efficiency", efficiency_df_proba$`Prob_a(1)`, efficiency_df_proba$efficiency_means),
+                                cbind("Variance of pd-EMEE", efficiency_df_proba$`Prob_a(1)`, efficiency_df_proba$mod_var*50),
+                                cbind("Variance of EMEE", efficiency_df_proba$`Prob_a(1)`, efficiency_df_proba$ori_var*50)))
+colnames(df_proba) <- c("grps", "Randomization Probability of Treatment", "Relative Efficiency")
+df_proba$`Randomization Probability of Treatment` <- as.numeric(df_proba$`Randomization Probability of Treatment`)
+df_proba$`Relative Efficiency` <- as.numeric(df_proba$`Relative Efficiency`)
+
+p2 <- ggplot(data=df_proba, aes(x=`Randomization Probability of Treatment`, y=`Relative Efficiency`, group=grps)) +
+  geom_line(aes(linetype=grps))+
+  geom_point(aes(size=grps))+
+  scale_size_manual(values=c(1, 0, 0))+
+  #labs(linetype="",x="Delta",y="Relative Efficiency") + 
+  scale_y_continuous(sec.axis = sec_axis(~./50, name = "Variance of Estimators"))+
+  theme(plot.title = element_text(size = 8, hjust = 0.5),
+        legend.title = element_blank(),
+        legend.position="bottom",
+        legend.text = element_text(size = 6), 
+        axis.text = element_text(size = 8),
+        axis.title = element_text(size = 8))+ 
+  ggtitle("Relative Efficiency of pd-EMEE to EMEE over Different Values of Randomization Probability of Treatment")
+
+require(gridExtra)
+pdf("figure2(combined).pdf")
+grid.arrange(p1, p2, respect=TRUE)
+dev.off()

@@ -1,9 +1,9 @@
 # Yihan Bao
 # 2021.04.06
 
-source("WCLS_modified.R")
-source("WCLS_original.R")
-source("GEE_estimators.R")
+source("estimator_implementation/WCLS_modified.R")
+source("estimator_implementation/WCLS_original.R")
+source("estimator_implementation/GEE_estimators.R")
 
 library(reshape)
 library(kableExtra)
@@ -43,7 +43,7 @@ for (t in 1:total_T) {
     }
 }  
 
-
+dta$days_since_download <- dta$days_since_download - 1
 
 
 
@@ -140,21 +140,21 @@ fit_wcls_newmod <- weighted_centered_least_square_withDelta_new(
   estimator_initial_value = NULL,
   Delta = 3
 )
-fit_wcls_newmod$beta_hat # 0.200735520        -0.005523186 
-fit_wcls_newmod$beta_se # 0.047996043         0.003225971 
+fit_wcls_newmod$beta_hat # 0.195212334        -0.005523186  
+fit_wcls_newmod$beta_se # 0.045330790         0.003225971 
 # 4939 data points used
 
 # estimator, SE, 95% CI, p-value
 t_quantile <- qt(0.975, 349 - 1 - 2) 
 
-fit_wcls_newmod$beta_hat # 0.200         -0.006 
-fit_wcls_newmod$beta_se_adjusted # 0.049         0.003
+fit_wcls_newmod$beta_hat # 0.195212334        -0.005523186  
+fit_wcls_newmod$beta_se_adjusted # 0.045972948         0.003269156 
 rbind(fit_wcls_newmod$beta_hat - t_quantile * fit_wcls_newmod$beta_se_adjusted,
       fit_wcls_newmod$beta_hat + t_quantile * fit_wcls_newmod$beta_se_adjusted)
-# (0.105, 0.296)        
-# (-0.012, 0.001)
+# (0.1047907, 0.2856339)        
+# (-0.0119531063, 0.0009067337)
 2 * pt(abs(fit_wcls_newmod$beta_hat) / fit_wcls_newmod$beta_se_adjusted, 349 - 1 - 2, lower.tail = FALSE)
-# 0.0000466932        0.0920275715 
+# 2.796715e-05        9.202757e-02 
 
 
 
@@ -174,20 +174,20 @@ fit_wclsmod <- weighted_centered_least_square_withDelta(
   Delta = 3
 )
 
-fit_wclsmod$beta_hat # 0.29972416         -0.01579804 
-fit_wclsmod$beta_se # 0.084473168         0.005009648 
+fit_wclsmod$beta_hat # 0.28392612         -0.01579804 
+fit_wclsmod$beta_se # 0.080722926         0.005009648 
 
 # estimator, SE, 95% CI, p-value
 t_quantile <- qt(0.975, 349 - 1 - 2) 
 
-fit_wclsmod$beta_hat # 0.300         -0.016 
-fit_wclsmod$beta_se_adjusted # 0.086         0.0051
+fit_wclsmod$beta_hat # 0.284         -0.016 
+fit_wclsmod$beta_se_adjusted # 0.081         0.005
 rbind(fit_wclsmod$beta_hat - t_quantile * fit_wclsmod$beta_se_adjusted,
       fit_wclsmod$beta_hat + t_quantile * fit_wclsmod$beta_se_adjusted)
-# (0.131, 0.468)        
-# (-0.026, -0.006)
+# (0.1226349, 0.4452174)        
+# (-0.025801483, -0.005794598)
 2 * pt(abs(fit_wclsmod$beta_hat) / fit_wclsmod$beta_se_adjusted, 349 - 1 - 2, lower.tail = FALSE)
-# 0.0005396576        0.0020519879 
+# 0.0006027207        0.0020519879
 
 
 ####### for debugging use #######
