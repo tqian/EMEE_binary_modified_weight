@@ -216,8 +216,8 @@ for (gamma in (4:9)/10) {
   result_table = rbind(result_table, result_df_collected)
 }
 
-saveRDS(efficiency_table, file = "efficiency_table_baserate.RDS")
-saveRDS(result_table, file = "result_table_baserate.RDS")
+saveRDS(efficiency_table, file = "../kaggle/working/efficiency_table_baserate.RDS")
+saveRDS(result_table, file = "../kaggle/working/result_table_baserate.RDS")
 
 # base rate
 base_rate_perDeltagamma <- function(Delta, gamma) {
