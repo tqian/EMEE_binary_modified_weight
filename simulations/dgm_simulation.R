@@ -75,7 +75,7 @@ beta_true_marginal_generalDelta <- function(Delta){
 # compute marginal beta_true
 if (0){
   total_T = 100#30
-  Delta = 3 #10
+  Delta = 10 #10
   beta_0 <- 0.1
   beta_1 <- 0.2
   prob_a <- 0.2

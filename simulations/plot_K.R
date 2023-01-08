@@ -46,12 +46,17 @@ beta_true_marginalK <- function(Delta, K){
   exp_h <- c(exp(beta_0+beta_1*0),exp(beta_0+beta_1*1),exp(beta_0+beta_1*2))
   prob_R_1 <- (1 - (1 - prob_R_0 * E_S^(Delta - 1)) * exp_h)/E_S^(Delta - 1)
     
-  Q <- (C - sum(exp_h * (C * prob_S_weight)) + 0.5^(1/Delta) * E_S^(Delta - 1) * sum(exp_h))/
-    (E_S^(Delta - 1) * C)
+  # Q <- (C - sum(exp_h * (C * prob_S_weight)) + 0.5^(1/Delta) * E_S^(Delta - 1) * sum(exp_h))/
+  #   (E_S^(Delta - 1) * C)
+  Q <- sum(prob_R_1 * prob_S_weight)
   Q_weighted <- (3/ C * 0.5^(1/ Delta)) * (1 - pa) + Q * pa
   
-  numerator <- sum( ((1- prob_R_1*E_S^K * Q_weighted^(Delta-K-1))) * prob_S_weight)
-  denominator <-  sum(((1- prob_R_0*E_S^K * Q_weighted^(Delta-K-1))) * prob_S_weight)
+  numerator <- sum( (1- prob_R_1*E_S^K * Q_weighted^(Delta-K-1)) * prob_S_weight)
+  denominator <-  sum( (1- prob_R_0*E_S^K * Q_weighted^(Delta-K-1)) * prob_S_weight)
+  
+  # prob_K_0 <- dbinom(0:(Delta - K - 1),(Delta - K - 1), (1 - pa)) # prob of number of A = 0
+  # sum((1- prob_R_1 *E_S^K * 
+  #   sum(E_S^(0:(Delta - K - 1)) * Q^((Delta - K - 1):0) * prob_K_0))  * prob_S_weight)
   
   beta_true_marginal <- log(numerator / denominator)
   return(beta_true_marginal)
@@ -72,7 +77,7 @@ library(doRNG)
 max_cores <- 16
 registerDoMC(min(detectCores() - 1, max_cores))
 sample_sizes <- c(30, 50, 100)
-nsim <- 20 #1000
+nsim <- 1000
 
 total_T <- 100 
 
@@ -85,7 +90,7 @@ efficiency_table = data.frame()
 result_table = data.frame()
 Delta = 10
 
-for (Kref in 0:(Delta-1)) {
+for (Kref in 0:(Delta - 1)) {
   #beta_true_marginal <- beta_true_marginal_generalDelta(Delta)
   beta_true_marginal <- beta_true_marginalK(Delta, Kref)
   result_df_collected <- data.frame()
@@ -182,7 +187,7 @@ for (Kref in 0:(Delta-1)) {
 saveRDS(efficiency_table, file = "efficiency_table_Kref(true beta).RDS")
 saveRDS(result_table, file = "result_table_delta_Kref(true beta).RDS")
 
-efficiency_table <- readRDS("efficiency_table_Kref.RDS.RDS")
+efficiency_table <- readRDS("efficiency_table_Kref(true beta).RDS")
 
 efficiency_means <- rowMeans(efficiency_table[,2:4])
 efficiency_table$efficiency_means <- efficiency_means
@@ -194,3 +199,36 @@ ggplot(efficiency_table) +
   ylab("Relative Efficiency") +
   xlab("K") +
   theme(legend.position="bottom") 
+
+
+##### create tables #####
+library(reshape)
+library(kableExtra)
+library(knitr)
+
+result_df_collected <- readRDS("result_table_delta_Kref(true beta).RDS")
+
+result_df_collected <- result_df_collected[, c(2, 1, 3:ncol(result_df_collected))]
+#result_df_collected$est <- factor(result_df_collected$est, c("wcls", "wcls_new", "gee_ind", "gee_exch"))
+#result_df_collected <- result_df_collected[order(result_df_collected$est, result_df_collected$ss), ]
+
+rownames(result_df_collected) <- NULL
+#colnames(result_df_collected) <- 
+#  c("Estimator", "Sample Size","Bias","SD","RMSE","CP(unadj)", "CP(adj)")
+
+result_df_collected[,3:5] <- round(result_df_collected[,3:5],3)
+result_df_collected[,6:7] <- round(result_df_collected[,6:7],2)
+colnames(result_df_collected)[8] <- "K"
+
+mycaption <- "caption for simulation 1"
+latex_code <- kable(result_df_collected, format = "latex", booktabs = T, align = "c", caption = mycaption) %>%
+  # add_header_above(c("est", "sample.size", "bias", "sd", "rmse", "cp.unadj", "cp.adj")) %>%
+  # column_spec(1, bold=T) %>%
+  collapse_rows(columns = 1, latex_hline = "major")
+print(latex_code)
+sink()
+
+
+for (Kref in 0:9) {
+  print(beta_true_marginalK(Delta, Kref) - beta_true_marginalK2(Delta, Kref))
+}
