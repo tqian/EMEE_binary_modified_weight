@@ -118,7 +118,7 @@ library(doRNG)
 max_cores <- 16
 registerDoMC(min(detectCores() - 1, max_cores))
 sample_sizes <- c(30, 50, 100)
-nsim <- 10
+nsim <- 1000
 Delta <- 3
 total_T <- 100 
 
