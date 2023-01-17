@@ -216,8 +216,8 @@ for (gamma in (4:9)/10) {
   result_table = rbind(result_table, result_df_collected)
 }
 
-saveRDS(efficiency_table, file = "../kaggle/working/efficiency_table_baserate.RDS")
-saveRDS(result_table, file = "../kaggle/working/result_table_baserate.RDS")
+# saveRDS(efficiency_table, file = "../kaggle/working/efficiency_table_baserate.RDS")
+# saveRDS(result_table, file = "../kaggle/working/result_table_baserate.RDS")
 
 # base rate
 base_rate_perDeltagamma <- function(Delta, gamma) {
@@ -231,11 +231,30 @@ base_rate_perDeltagamma <- function(Delta, gamma) {
   return(e_base_rate)
 }
 
-base_rate_perDeltagamma(3, 0.5)
+efficiency_table = readRDS("efficiency_table_baserate.RDS")
+base_rates = apply(as.array((4:9)/10), 1, base_rate_perDeltagamma, Delta = Delta)
+efficiency_means <- rowMeans(efficiency_table[,2:4])
+efficiency_table$efficiency_means <- efficiency_means
+colnames(efficiency_table) <- c("gamma", "SS = 30", "SS = 50", "SS = 100", "efficiency_means")
 
-df_delta <- as.data.frame(rbind(cbind("Relative Efficiency", base_rates, efficiency_df_delta$efficiency_means),
-                                cbind("Variance of pd-EMEE", base_rates, efficiency_df_delta$mod_var*200),
-                                cbind("Variance of EMEE", base_rates, efficiency_df_delta$ori_var*200)))
+result_table = readRDS("result_table_baserate.RDS")
+var <- result_table$sd^2 * result_table$ss
+result_table$var <- var
+mod_df <- result_table[result_table$est == "modified-EMEE",]
+mod_avg = mod_df %>%
+  group_by(group = gl(n()/3, 3)) %>%
+  summarise_at(-1, mean, na.rm = TRUE)
+mod_var <- mod_avg$var
+
+ori_df <- result_table[result_table$est == "EMEE",]
+ori_avg = ori_df %>%
+  group_by(group = gl(n()/3, 3)) %>%
+  summarise_at(-1, mean, na.rm = TRUE)
+ori_var <- ori_avg$var
+
+df_delta <- as.data.frame(rbind(cbind("Relative Efficiency", base_rates, efficiency_table$efficiency_means),
+                                cbind("Variance of pd-EMEE", base_rates, mod_var*2),
+                                cbind("Variance of EMEE", base_rates, ori_var*2)))
 colnames(df_delta) <- c("grps", "Base Rate","Relative Efficiency")
 df_delta$`Base Rate` <- as.numeric(df_delta$`Base Rate`)
 df_delta$`Relative Efficiency` <- as.numeric(df_delta$`Relative Efficiency`)
@@ -245,7 +264,7 @@ p1 <- ggplot(data=df_delta, aes(x=`Base Rate`, y=`Relative Efficiency`, group=gr
   geom_point(aes(size=grps))+
   scale_size_manual(values=c(1, 0, 0))+
   #labs(linetype="",x="Delta",y="Relative Efficiency") + 
-  scale_y_continuous(sec.axis = sec_axis(~./200, name = "Variance of Estimators"))+
+  scale_y_continuous(sec.axis = sec_axis(~./2, name = "Variance of Estimators"))+
   theme(plot.title = element_text(size = 8, hjust = 0.5),
         legend.title = element_blank(),
         legend.position="bottom",
@@ -253,7 +272,7 @@ p1 <- ggplot(data=df_delta, aes(x=`Base Rate`, y=`Relative Efficiency`, group=gr
         axis.text = element_text(size = 8),
         axis.title = element_text(size = 8))+ 
   ggtitle("Relative Efficiency of pd-EMEE to EMEE over Different Values of Base Rates")
-
+p1
 # result_df_delta <- readRDS("result_table_delta(with sd).RDS")
 # efficiency_df_delta <- readRDS("efficiency_table_delta(with sd).RDS")
 # 
