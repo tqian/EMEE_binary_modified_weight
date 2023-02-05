@@ -7,8 +7,8 @@ source("estimator_implementation/GEE_estimators.R")
 #######
 dgm_baserate <- function(sample_size, total_T, Delta, gamma, prob_a = 0.2) {
   
-  beta_0 <- 0.1
-  beta_1 <- 0.2
+  beta_0 <- 0
+  beta_1 <- 0
   
   df_names <- c("userid", "day", "A", "S", "S2","prob_A","prob_R_0", "prob_R","R","Y","k") 
   # prob_R_0 is the probability of R = 0 given A = 0.
@@ -28,7 +28,7 @@ dgm_baserate <- function(sample_size, total_T, Delta, gamma, prob_a = 0.2) {
   for (t in 1:total_T) {
     # row index for the rows corresponding to day t for every subject
     row_index <- seq(from = t, by = total_T, length = sample_size)
-    dta$S[row_index] <- sample(c(0,1,2), sample_size, prob = prob_S_weight, replace = TRUE)
+    dta$S[row_index] <- sample(c(0,0.1,0.2), sample_size, prob = prob_S_weight, replace = TRUE)
     dta$S2[row_index] <- ifelse(dta$S[row_index] == 2, 1, 0) 
     dta$prob_A[row_index] <- rep(prob_a, sample_size)
     dta$A[row_index] <- rbinom(sample_size, 1, dta$prob_A[row_index])
@@ -60,8 +60,8 @@ dgm_baserate <- function(sample_size, total_T, Delta, gamma, prob_a = 0.2) {
 }
 
 beta_true_marginal_baserate <- function(Delta, gamma){
-  beta_0 <- 0.1
-  beta_1 <- 0.2
+  beta_0 <- 0
+  beta_1 <- 0
   
   C = (0.5^(-0.5/Delta) + 1 + 0.5^(0.5/Delta))
   prob_S_weight = c(0.5^(-0.5/Delta)/C, 1/C, 0.5^(0.5/Delta)/C)
@@ -69,12 +69,11 @@ beta_true_marginal_baserate <- function(Delta, gamma){
   E_S = 0.5^(1/Delta)* (gamma_star)/C 
   
   prob_R_0 <-  c((0.5*gamma)^((1.5-0.5*0)/Delta), 
-                 (0.5*gamma)^((1.5-0.5*1)/Delta),
-                 (0.5*gamma)^((1.5-0.5*2)/Delta))
-  exp_h <- c(exp(beta_0+beta_1*0),exp(beta_0+beta_1*1),exp(beta_0+beta_1*2))
+                 (0.5*gamma)^((1.5-0.5*0.1)/Delta),
+                 (0.5*gamma)^((1.5-0.5*0.2)/Delta))
+  exp_h <- c(exp(beta_0+beta_1*0),exp(beta_0+beta_1*0.1),exp(beta_0+beta_1*0.2))
   
-  prob_R_1 <- (1- (1-prob_R_0*E_S^(Delta-1)) * 
-                   exp(beta_0+beta_1*c(0,1,2))) / E_S^(Delta-1)
+  prob_R_1 <- (1- (1-prob_R_0*E_S^(Delta-1)) * exp_h) / E_S^(Delta-1)
   
   numerator <- sum( ((1- prob_R_0*E_S^(Delta-1)) * exp_h) * prob_S_weight)
   denominator <-  sum( (1- prob_R_0*E_S^(Delta-1)) * prob_S_weight)
@@ -128,9 +127,9 @@ library(doRNG)
 max_cores <- 16
 registerDoMC(min(detectCores() - 1, max_cores))
 sample_sizes <- c(30, 50, 100)
-nsim <- 500
+nsim <- 200
 Delta <- 3
-total_T <- 30
+total_T <- 100
   #100 
 
 control_vars <- "S"
@@ -141,7 +140,7 @@ set.seed(1)
 efficiency_table = data.frame()
 result_table = data.frame()
 
-for (gamma in seq(18,8)/10) {
+for (gamma in c(0.5, 1, 1.5)) {
   beta_true_marginal <- beta_true_marginal_baserate(Delta, gamma)
   result_df_collected <- data.frame()
   for (i_ss in 1:length(sample_sizes)) {
@@ -240,15 +239,15 @@ base_rate_perDeltagamma <- function(Delta, gamma) {
   gamma_star = gamma^(1.5/Delta) + gamma^(1/Delta) + gamma^(0.5/Delta)
   E_S = 0.5^(1/Delta)* (gamma_star)/C 
   
-  base_rate_vals = c(1 - (0.5*gamma)^(1.5/Delta)* (E_S)^(Delta - 1),
-                     1 - (0.5*gamma)^(1  /Delta)* (E_S)^(Delta - 1),
-                     1 - (0.5*gamma)^(0.5/Delta)* (E_S)^(Delta - 1))
+  base_rate_vals = c(1 - (0.5*gamma)^((1.5-0.5*0)/Delta)* (E_S)^(Delta - 1),
+                     1 - (0.5*gamma)^((1.5-0.5*0.1)/Delta)* (E_S)^(Delta - 1),
+                     1 - (0.5*gamma)^((1.5-0.5*0.2)/Delta)* (E_S)^(Delta - 1))
   e_base_rate = sum(prob_S_weight * base_rate_vals)
   return(e_base_rate)
 }
 
 efficiency_table = readRDS("efficiency_table_baserate.RDS")
-base_rates = apply(as.array(seq(18,8)/10), 1, base_rate_perDeltagamma, Delta = Delta)
+base_rates = apply(as.array(c(0.5,1,1.5)), 1, base_rate_perDeltagamma, Delta = Delta)
 efficiency_means <- rowMeans(efficiency_table[,2:4])
 efficiency_table$efficiency_means <- efficiency_means
 colnames(efficiency_table) <- c("gamma", "SS = 30", "SS = 50", "SS = 100", "efficiency_means")
