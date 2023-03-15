@@ -98,77 +98,7 @@ p2 <- ggplot(data=df_proba, aes(x=`Randomization Probability of Treatment`, y=`R
 p2
 
 
-
-# relative efficiency vs. base rate ---------------------------------------
-
-## load simulation results
-
-efficiency_table_baserate = readRDS("simulations/results/efficiency_table_baserate.RDS")
-result_table_baserate = readRDS("simulations/results/result_table_baserate.RDS")
-
-## construct data frame for making plot
-
-Delta <- 3
-total_T <- 100 
-
-base_rate_perDeltagamma <- function(Delta, gamma) {
-    C = (gamma^(-0.5/Delta) + 1 + gamma^(0.5/Delta))
-    prob_S_weight = c(gamma^(-0.5/Delta)/C, 1/C, gamma^(0.5/Delta)/C)
-    
-    base_rate_vals = c(1 - gamma^(1 +0.5/Delta)* (3/C)^(Delta - 1),
-                       1 - gamma^(1 +0  /Delta)* (3/C)^(Delta - 1),
-                       1 - gamma^(1 -0.5/Delta)* (3/C)^(Delta - 1))
-    e_base_rate = sum(prob_S_weight * base_rate_vals)
-    return(e_base_rate)
-}
-
-base_rates = apply(as.array((4:9)/10), 1, base_rate_perDeltagamma, Delta = Delta)
-efficiency_means <- rowMeans(efficiency_table_baserate[,2:4])
-efficiency_table_baserate$efficiency_means <- efficiency_means
-colnames(efficiency_table_baserate) <- c("gamma", "SS = 30", "SS = 50", "SS = 100", "efficiency_means")
-
-var <- result_table_baserate$sd^2
-result_table_baserate$var <- var
-mod_df <- result_table_baserate[result_table_baserate$est == "modified-EMEE",-2]
-mod_avg = mod_df %>%
-    group_by(group = gl(n()/3, 3)) %>%
-    summarise_at(-1, mean, na.rm = TRUE)
-mod_var <- mod_avg$var
-
-ori_df <- result_table_baserate[result_table_baserate$est == "EMEE",-2]
-ori_avg = ori_df %>%
-    group_by(group = gl(n()/3, 3)) %>%
-    summarise_at(-1, mean, na.rm = TRUE)
-ori_var <- ori_avg$var
-
-df_baserate <- as.data.frame(rbind(cbind("Relative Efficiency", base_rates, efficiency_table_baserate$efficiency_means),
-                                cbind("Variance of pd-EMEE", base_rates, mod_var*100),
-                                cbind("Variance of EMEE", base_rates, ori_var*100)))
-colnames(df_baserate) <- c("grps", "Base Rate","Relative Efficiency")
-df_baserate$`Base Rate` <- as.numeric(df_baserate$`Base Rate`)
-df_baserate$`Relative Efficiency` <- as.numeric(df_baserate$`Relative Efficiency`)
-
-## make plot
-
-p3 <- ggplot(data=df_baserate, aes(x=`Base Rate`, y=`Relative Efficiency`, group=grps)) +
-    geom_line(aes(linetype=grps))+
-    geom_point(aes(size=grps))+
-    scale_size_manual(values=c(1, 0, 0))+
-    #labs(linetype="",x="Delta",y="Relative Efficiency") + 
-    scale_y_continuous(sec.axis = sec_axis(~./50, name = "Variance of Estimators"))+
-    theme(plot.title = element_text(size = 8, hjust = 0.5),
-          legend.title = element_blank(),
-          legend.position="bottom",
-          legend.text = element_text(size = 6), 
-          axis.text = element_text(size = 8),
-          axis.title = element_text(size = 8))+ 
-    ggtitle("Relative Efficiency of pd-EMEE to EMEE over Different Values of Base Rates")
-p3
-
-
 # relative efficiency vs. K (reference regime) ----------------------------
-
-# TQ: Yihan please add code to here, refer to my example code above
 
 ## load simulation results
 efficiency_table_K = readRDS("simulations/results/efficiency_table_K.RDS")
@@ -201,7 +131,7 @@ df_K$`K` <- as.numeric(df_K$`K`)
 df_K$`Relative Efficiency` <- as.numeric(df_K$`Relative Efficiency`)
 
 ## make plot
-p4 <- ggplot(data=df_K, aes(x=`K`, y=`Relative Efficiency`, group=grps)) +
+p3 <- ggplot(data=df_K, aes(x=`K`, y=`Relative Efficiency`, group=grps)) +
   geom_line(aes(linetype=grps))+
   geom_point(aes(size=grps))+
   scale_size_manual(values=c(1, 0, 0))+
@@ -214,6 +144,6 @@ p4 <- ggplot(data=df_K, aes(x=`K`, y=`Relative Efficiency`, group=grps)) +
         axis.text = element_text(size = 8),
         axis.title = element_text(size = 8))+ 
   ggtitle("Relative Efficiency of pd-EMEE to EMEE over Different Values of K")
-p4
+p3
 
 

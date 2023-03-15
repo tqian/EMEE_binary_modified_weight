@@ -22,11 +22,16 @@ performance of pd-EMEE, EMEE and GEE for fully marginal effect, setting delta = 
 * [simulation_results(with_moderator).R](simulations/simulation_results(with_moderator).R): Code for comparing the  
 performance of pd-EMEE, EMEE and GEE for causal effect with moderator, setting delta = 3 and = 10 respectively.
 
-* [simulation_figures.R](simulations/simulation_figures.R): Code for reproducing the efficiency plot vs different Deltas and vs different randomization probability of treatment in the paper. 
+* [all simulation plots.R](simulations/all simulation plots.R): Code for reproducing the efficiency plot vs different Deltas and vs different randomization probability of treatment (and vs different reference regime) in the paper (and appendix H). 
 
-* [plot_delta.R](simulations/plot_delta.R): Code for reproducing the raw simulation result of relative efficiency across different deltas, preparation for Figure 2.
+* [plot_delta.R](simulations/plot_delta.R): Code for reproducing the raw simulation result of relative efficiency across different deltas, preparation for Figure 2 (left).
 
-* [plot_proba.R](simulations/plot_proba.R): Code for reproducing the raw simulation result of relative efficiency across different deltas, preparation for Figure 3.
+* [plot_proba.R](simulations/plot_proba.R): Code for reproducing the raw simulation result of relative efficiency across different deltas, preparation for Figure 2 (right). 
+
+* [plot_K.R](simulations/plot_K.R): Code for reproducing the raw simulation result of relative efficiency across different reference regime, preparation for Appendix H.
+
+* [utils_forK.R](simulations/utils_forK.R): Code for helper functions of plot_K.R.
+
 
 * [dgm_simulation.R](simulations/dgm_simulation.R): a data-generative model for MRT data, used for simulation presented in the paper. (Described in the beginning of Section 4 of paper)
 
@@ -36,12 +41,12 @@ performance of pd-EMEE, EMEE and GEE for causal effect with moderator, setting d
 ## Replicating Results
 
 ### Simulations
-* Run [simulation_figures.R](simulations/simulation_figures.R) to reproduce the efficiency plot vs different Deltas and vs different randomization probability of treatment in the paper (Figure 2&3). 
+* Run [all simulation plots.R](simulations/all simulation plots.R) to reproduce the efficiency plot vs different Deltas and vs different randomization probability of treatment in the paper (Figure 2), and Appendix H. 
 
 * Run [simulation_results(marginal).R](simulations/simulation_results(marginal).R) to reproduce the table of
-estimating performance across pd-EMEE, EMEE and GEE for fully marginal effect, setting delta = 3 and 10 for generating Table 1&3 respectively.
+estimating performance across pd-EMEE, EMEE and GEE for fully marginal effect, setting delta = 3 and 10 for generating Table 2 respectively.
 
-* Run [simulation_results(with_moderator).R](simulations/simulation_results(with_moderator).R) to reproduce the table of estimating performance across pd-EMEE, EMEE and GEE for causal effect with moderator, setting delta = 3 and 10 for generating Table 2&4 respectively.
+* Run [simulation_results(with_moderator).R](simulations/simulation_results(with_moderator).R) to reproduce the table of estimating performance across pd-EMEE, EMEE and GEE for causal effect with moderator, setting delta = 3 and 10 for generating Table 3 respectively.
 
 ### Applications
 * Run [analysis.R](data_analysis/analysis.R) to reproduce the data analysis section of paper.
