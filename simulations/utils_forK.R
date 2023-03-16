@@ -47,6 +47,8 @@ weighted_centered_least_square_forK_new <- function(
   ## estimator_initial_value.....initial value for the estimator in the root finding algorithm
   ##                             length is len(control_varname) + len(moderator_varname) + 2
   ##                             default to NULL (in which case the intial value = all 0's)
+  ## Delta ................ the length of time window
+  ## Kref ................. the length of reference regime
   
   ############## return value ###############
   ##
@@ -346,6 +348,8 @@ weighted_centered_least_square_forK <- function(
   ## estimator_initial_value.....initial value for the estimator in the root finding algorithm
   ##                             length is len(control_varname) + len(moderator_varname) + 2
   ##                             default to NULL (in which case the intial value = all 0's)
+  ## Delta ................ the length of time window
+  ## Kref ................. the length of reference regime
   
   ############## return value ###############
   ##

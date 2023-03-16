@@ -166,14 +166,13 @@ for (prob_a in (1:8)/10) {
     result_table = rbind(result_table, result_df_collected)
 }
 
-#saveRDS(efficiency_table, file = "efficiency_table_proba.RDS")
-saveRDS(efficiency_table, file = "efficiency_table_proba(with sd).RDS")
-saveRDS(result_table, file = "result_table_proba(with sd).RDS")
+saveRDS(efficiency_table, file = "efficiency_table_proba.RDS")
+saveRDS(result_table, file = "result_table_proba.RDS")
 
 
 ##### create plots for paper #####
 
-#efficiency_table <- readRDS("efficiency_table_proba.RDS")
+efficiency_table <- readRDS("efficiency_table_proba.RDS")
 colnames(efficiency_table) <- c("Prob_a(1)","SS = 30", "SS = 50", "SS = 100")
 efficiency_means <- rowMeans(efficiency_table[,2:4])
 efficiency_table$efficiency_means <- efficiency_means
