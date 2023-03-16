@@ -22,7 +22,7 @@ performance of pd-EMEE, EMEE and GEE for fully marginal effect, setting delta = 
 * [simulation_results(with_moderator).R](simulations/simulation_results(with_moderator).R): Code for comparing the  
 performance of pd-EMEE, EMEE and GEE for causal effect with moderator, setting delta = 3 and = 10 respectively.
 
-* [all simulation plots.R](simulations/all simulation plots.R): Code for reproducing the efficiency plot vs different Deltas and vs different randomization probability of treatment (and vs different reference regime) in the paper (and appendix H). 
+* [all_simulation_plots.R](simulations/all_simulation_plots.R): Code for reproducing the efficiency plot vs different Deltas and vs different randomization probability of treatment (and vs different reference regime) in the paper (and appendix H). 
 
 * [plot_delta.R](simulations/plot_delta.R): Code for reproducing the raw simulation result of relative efficiency across different deltas, preparation for Figure 2 (left).
 
@@ -41,7 +41,7 @@ performance of pd-EMEE, EMEE and GEE for causal effect with moderator, setting d
 ## Replicating Results
 
 ### Simulations
-* Run [all simulation plots.R](simulations/all simulation plots.R) to reproduce the efficiency plot vs different Deltas and vs different randomization probability of treatment in the paper (Figure 2), and Appendix H. 
+* Run [all_simulation_plots.R](simulations/all_simulation_plots.R) to reproduce the efficiency plot vs different Deltas and vs different randomization probability of treatment in the paper (Figure 2), and Appendix H. 
 
 * Run [simulation_results(marginal).R](simulations/simulation_results(marginal).R) to reproduce the table of
 estimating performance across pd-EMEE, EMEE and GEE for fully marginal effect, setting delta = 3 and 10 for generating Table 2 respectively.
