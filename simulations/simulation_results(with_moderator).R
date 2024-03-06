@@ -47,10 +47,10 @@ compute_result_beta <- function(beta_true, beta, beta_se, beta_se_adjusted, mode
   return(list(bias = bias, sd = sd, rmse = rmse, coverage_prob = coverage_prob, coverage_prob_adjusted = coverage_prob_adj))
 }
 
-source("dgm_simulation.R")
-source("WCLS_modified.R")
-source("WCLS_original.R")
-source("GEE_estimators.R")
+source("simulations/dgm_simulation.R")
+source("estimator_implementation/WCLS_modified.R")
+source("estimator_implementation/WCLS_original.R")
+source("estimator_implementation/GEE_estimators.R")
 
 data_generating_process <- dgm_binary_categorical_covariate_new
 
