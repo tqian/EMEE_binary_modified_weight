@@ -710,6 +710,7 @@ weighted_centered_least_square_withDelta_improved_old <- function(
   Sigman_tilde <- 0
   for (i in 1:sample_size) {
     D_term_i <- D_term_collected[, person_first_index[i] : (person_first_index[i+1] - 1)]
+    if (p == 1){D_term_i <- t(D_term_i)}
     r_term_i <- matrix(r_term_collected[person_first_index[i] : (person_first_index[i+1] - 1)], ncol = 1)
     partialr_partialtheta_i <- partialr_partialtheta_collected[person_first_index[i] : (person_first_index[i+1] - 1), ]
     H_ii <- partialr_partialtheta_i %*% Mn_inv %*% D_term_i / sample_size

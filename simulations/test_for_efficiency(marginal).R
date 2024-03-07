@@ -16,9 +16,9 @@ registerDoMC(min(detectCores() - 1, max_cores))
 sample_sizes <- c(30, 50, 100)
 nsim <- 100
 
-Delta <- 10 # Delta <- 10
+Delta <- 3 # Delta <- 10
 total_T <- 100 
-beta_true <- beta_true_marginal_generalDelta(Delta)
+beta_true_marginal <- beta_true_marginal_generalDelta(Delta)
 
 control_vars <- "S"
 moderator_vars <- c()
@@ -36,7 +36,7 @@ for (i_ss in 1:length(sample_sizes)) {
     dta <- data_generating_process(sample_size, total_T, Delta = Delta)
     
     # Improved EMEE estimator
-    fit_wcls_improved <- weighted_centered_least_square_withDelta_improved(
+    fit_wcls_improved <- weighted_centered_least_square_withDelta_improved_old(
       dta = dta,
       id_varname = "userid",
       decision_time_varname = "day",
@@ -94,15 +94,13 @@ for (i_ss in 1:length(sample_sizes)) {
   beta_names <- c("Intercept", moderator_vars)
   num_estimator <- length(ee_names)
   
-  # beta <- simplify2array(lapply(result, function(l) matrix(c(l$fit_wcls_improved$beta_hat))))
-  # beta_se <- simplify2array(lapply(result, function(l) matrix(c(l$fit_wcls_improved$beta_se))))
   beta <- simplify2array(lapply(result, function(l) matrix(c(l$fit_wcls_improved$beta_hat, l$fit_wcls_new$beta_hat, l$fit_wcls$beta_hat),
                                                            nrow = length(ee_names), byrow = TRUE, dimnames = list(ee_names, beta_names))))
   beta_se <- simplify2array(lapply(result, function(l) matrix(c(l$fit_wcls_improved$beta_se, l$fit_wcls_new$beta_se, l$fit_wcls$beta_se),
                                                               nrow = length(ee_names), byrow = TRUE, dimnames = list(ee_names, beta_names))))
   
-  result <- compute_result_beta_woadjusted(beta_true, beta, beta_se, moderator_vars, control_vars, significance_level,
-                                           na.rm = FALSE)
+  # result <- compute_result_beta_woadjusted(beta_true_marginal, beta, beta_se, moderator_vars, control_vars, significance_level, na.rm = FALSE)
+  result <- compute_result_beta(beta_true_marginal, beta, beta_se, beta_se_adjusted, moderator_vars, control_vars, significance_level = 0.05)
   
   result_df <- data.frame(ss = rep(sample_size, num_estimator),
                           est = ee_names,
