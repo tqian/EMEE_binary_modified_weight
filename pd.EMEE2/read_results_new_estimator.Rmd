@@ -1,0 +1,26 @@
+---
+title: "read_results"
+author: "Yihan Bao yb254"
+date: "2/25/2024"
+output: html_document
+---
+# marginal, delta = 3, nsim = 1000
+```{r}
+`result_simulation_improved(marginal)` <- readRDS("~/Desktop/research/uci research/github code for modified EMEE/pd.EMEE2/result_simulation_improved_delta3_marginal.RDS")
+colnames(`result_simulation_improved(marginal)`) <-  c("Estimator", "Sample Size",rep(c("Bias","SD","RMSE","CP(unadj)", "CP(adj)"),1))
+`result_simulation_improved(marginal)`[3:6] <- round(`result_simulation_improved(marginal)`[3:6], 3)
+`result_simulation_improved(marginal)`
+```
+# moderator, delta = 3, nsim = 1000
+```{r}
+`result_simulation_improved(moderator)` <- readRDS("~/Desktop/research/uci research/github code for modified EMEE/pd.EMEE2/result_simulation_improved_delta3_moderator.RDS")
+`result_simulation_improved(moderator)`  <- `result_simulation_improved(moderator)` [,c(1,2,3,5,7,9,11, 4,6,8,10,12)]
+colnames(`result_simulation_improved(moderator)`) <-  c("Estimator", "Sample Size",rep(c("Bias","SD","RMSE","CP(unadj)", "CP(adj)"),2))
+`result_simulation_improved(moderator)`[,3:12] <- round(`result_simulation_improved(moderator)`[,3:12], 3)
+`result_simulation_improved(moderator)`
+```
+# marginal, delta = 10, nsim = 1000
+```{r}
+readRDS("~/Desktop/research/uci research/github code for modified EMEE/pd.EMEE2/result_simulation_improved_delta10_moderator_1.RDS")
+```
+
