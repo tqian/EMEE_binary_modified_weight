@@ -1,8 +1,19 @@
-source("simulations/dgm_simulation.R")
-source("estimator_implementation/WCLS_modified.R")
-source("estimator_implementation/WCLS_original.R")
-source("estimator_implementation/GEE_estimators.R")
-source("estimator_implementation/EMEE_ImprovedEffByProjection.R")
+# code to conduct simulation 1 and create table for paper
+
+# Tianchen Qian
+# 2018.08.12
+
+# simulation part is copied from simulation.R
+# table creation part is copied from U-stat paper
+
+# update on 2019.02.06: to include eif_modified_weight
+
+# update on 2019.03.29: to include GEE with exchangeable correlation structure
+
+# update on 2021.07.31: to include current estimator 
+##### simulation part #####
+
+rm(list = ls())
 
 compute_result_beta <- function(beta_true, beta, beta_se, beta_se_adjusted, moderator_vars, control_vars, significance_level,
                                 na.rm = FALSE) {
@@ -36,6 +47,13 @@ compute_result_beta <- function(beta_true, beta, beta_se, beta_se_adjusted, mode
   return(list(bias = bias, sd = sd, rmse = rmse, coverage_prob = coverage_prob, coverage_prob_adjusted = coverage_prob_adj))
 }
 
+source("dgm_simulation.R")
+source("WCLS_modified.R")
+source("WCLS_original.R")
+source("GEE_estimators.R")
+
+data_generating_process <- dgm_binary_categorical_covariate_new
+
 library(tidyverse)
 library(foreach)
 library(doMC)
@@ -46,8 +64,7 @@ registerDoMC(min(detectCores() - 1, max_cores))
 sample_sizes <- c(30, 50, 100)
 nsim <- 1000
 
-data_generating_process <- dgm_binary_categorical_covariate_new
-Delta <- 10 # Delta <- 10
+Delta <- 3 # Delta <- 10
 total_T <- 100 
 beta_true_marginal <- beta_true_marginal_generalDelta(Delta)
 
@@ -57,6 +74,7 @@ moderator_vars <- c()
 result_df_collected <- data.frame()
 
 for (i_ss in 1:length(sample_sizes)) {
+  
   sample_size <- sample_sizes[i_ss]
   
   result <- foreach(isim = 1:nsim, .combine = "c") %dorng% {
@@ -64,23 +82,6 @@ for (i_ss in 1:length(sample_sizes)) {
       cat(paste("Starting iteration",isim,"\n"))
     }
     dta <- data_generating_process(sample_size, total_T, Delta = Delta)
-    
-    # Improved EMEE estimator
-    EMEE_ImprovedEffByProjection_measurableWeightNotTakenOut_wrapper(
-      dta = dta,
-      id_varname = "userid",
-      decision_time_varname = "day",
-      treatment_varname = "A",
-      outcome_varname = "Y",
-      control_varname = control_vars,
-      moderator_varname = moderator_vars,
-      rand_prob_varname = "prob_A",
-      rand_prob_tilde_varname = NULL,
-      rand_prob_tilde = 0.2,
-      estimator_initial_value = NULL,
-      Delta = Delta,
-      link_function_for_nuisance_prediction = "poisson" 
-    )
     
     # new EMEE estimator
     fit_wcls_new <- weighted_centered_least_square_withDelta_new(
@@ -114,27 +115,54 @@ for (i_ss in 1:length(sample_sizes)) {
       Delta = Delta
     )
     
-    output <- list(list(fit_wcls_improved = fit_wcls_improved, 
-                        fit_wcls_new = fit_wcls_new,
-                        fit_wcls= fit_wcls))
+    fit_gee_ind <- log_linear_GEE_geepack(
+      dta = dta,
+      id_varname = "userid",
+      decision_time_varname = "day",
+      treatment_varname = "A",
+      outcome_varname = "Y",
+      control_varname = control_vars,
+      moderator_varname = moderator_vars,
+      estimator_initial_value = NULL,
+      corstr = "independence"
+    )
+    
+    fit_gee_exch <- log_linear_GEE_geepack(
+      dta = dta,
+      id_varname = "userid",
+      decision_time_varname = "day",
+      treatment_varname = "A",
+      outcome_varname = "Y",
+      control_varname = control_vars,
+      moderator_varname = moderator_vars,
+      estimator_initial_value = NULL,
+      corstr = "exchangeable"
+    )
+    
+    output <- list(list(fit_wcls_new = fit_wcls_new, fit_wcls = fit_wcls,fit_gee_ind = fit_gee_ind, fit_gee_exch = fit_gee_exch))
   }
-  sink()
+  #sink()
   
-  ee_names <- c("improved.EMEE", "pd.EMEE", "EMEE")
-  alpha_names <- c("Intercept", control_vars, control_vars)
+  ee_names <- c("pd.EMEE", "EMEE", "gee_ind", "gee_exch")
+  alpha_names <- c("Intercept", control_vars)
   beta_names <- c("Intercept", moderator_vars)
   num_estimator <- length(ee_names)
   
-  beta <- simplify2array(lapply(result, function(l) matrix(c(l$fit_wcls_improved$beta_hat, l$fit_wcls_new$beta_hat, l$fit_wcls$beta_hat),
+  
+  alpha <- simplify2array(lapply(result, function(l) matrix(c(l$fit_wcls_new$alpha_hat, l$fit_wcls$alpha_hat, l$fit_gee_ind$alpha_hat, l$fit_gee_exch$alpha_hat),
+                                                            nrow = length(ee_names), byrow = TRUE, dimnames = list(ee_names, alpha_names))))
+  alpha_se <- simplify2array(lapply(result, function(l) matrix(c(l$fit_wcls_new$alpha_se, l$fit_wcls$alpha_se, l$fit_gee_ind$alpha_se, l$fit_gee_exch$alpha_se),
+                                                               nrow = length(ee_names), byrow = TRUE, dimnames = list(ee_names, alpha_names))))
+  alpha_se_adjusted <- simplify2array(lapply(result, function(l) matrix(c(l$fit_wcls_new$alpha_se_adjusted, l$fit_wcls$alpha_se_adjusted, l$fit_gee_ind$alpha_se_adjusted, l$fit_gee_exch$alpha_se_adjusted),
+                                                                        nrow = length(ee_names), byrow = TRUE, dimnames = list(ee_names, alpha_names))))
+  beta <- simplify2array(lapply(result, function(l) matrix(c(l$fit_wcls_new$beta_hat, l$fit_wcls$beta_hat, l$fit_gee_ind$beta_hat, l$fit_gee_exch$beta_hat),
                                                            nrow = length(ee_names), byrow = TRUE, dimnames = list(ee_names, beta_names))))
-  beta_se <- simplify2array(lapply(result, function(l) matrix(c(l$fit_wcls_improved$beta_se, l$fit_wcls_new$beta_se, l$fit_wcls$beta_se),
+  beta_se <- simplify2array(lapply(result, function(l) matrix(c(l$fit_wcls_new$beta_se, l$fit_wcls$beta_se, l$fit_gee_ind$beta_se, l$fit_gee_exch$beta_se),
                                                               nrow = length(ee_names), byrow = TRUE, dimnames = list(ee_names, beta_names))))
-  beta_se_adjusted <- simplify2array(lapply(result, function(l) matrix(c(l$fit_wcls_improved$beta_se_adjusted, l$fit_wcls_new$beta_se_adjusted, l$fit_wcls$beta_se_adjusted),
+  beta_se_adjusted <- simplify2array(lapply(result, function(l) matrix(c(l$fit_wcls_new$beta_se_adjusted, l$fit_wcls$beta_se_adjusted, l$fit_gee_ind$beta_se_adjusted, l$fit_gee_exch$beta_se_adjusted),
                                                                        nrow = length(ee_names), byrow = TRUE, dimnames = list(ee_names, beta_names))))
   
-  
   result <- compute_result_beta(beta_true_marginal, beta, beta_se, beta_se_adjusted, moderator_vars, control_vars, significance_level = 0.05)
-  
   result_df <- data.frame(ss = rep(sample_size, num_estimator),
                           est = ee_names,
                           bias = result$bias,
@@ -146,6 +174,33 @@ for (i_ss in 1:length(sample_sizes)) {
   rownames(result_df) <- NULL
   
   result_df_collected <- rbind(result_df_collected, result_df)
-  
 }
-saveRDS(result_df_collected, file = "result_simulation_delta10_marginal.RDS")
+
+saveRDS(result_df_collected, file = "result_simulation_marginal.RDS")
+
+##### create tables for paper #####
+
+library(reshape)
+library(kableExtra)
+library(knitr)
+
+result_df_collected <- readRDS("result_simulation_marginal.RDS")
+
+result_df_collected <- result_df_collected[, c(2, 1, 3:ncol(result_df_collected))]
+result_df_collected$est <- factor(result_df_collected$est, c("wcls", "wcls_new", "gee_ind", "gee_exch"))
+result_df_collected <- result_df_collected[order(result_df_collected$est, result_df_collected$ss), ]
+
+rownames(result_df_collected) <- NULL
+colnames(result_df_collected) <- 
+  c("Estimator", "Sample Size","Bias","SD","RMSE","CP(unadj)", "CP(adj)")
+
+result_df_collected[,3:5] <- round(result_df_collected[,3:5],3)
+result_df_collected[,6:7] <- round(result_df_collected[,6:7],2)
+
+mycaption <- "caption for simulation 1"
+latex_code <- kable(result_df_collected, format = "latex", booktabs = T, align = "c", caption = mycaption) %>%
+  # add_header_above(c("est", "sample.size", "bias", "sd", "rmse", "cp.unadj", "cp.adj")) %>%
+  # column_spec(1, bold=T) %>%
+  collapse_rows(columns = 1, latex_hline = "major")
+print(latex_code)
+sink()
